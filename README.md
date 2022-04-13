@@ -116,3 +116,92 @@ M&#91;i&#93;&#91;j&#93;의 값은 다음과 같이 대각선을 하나씩 증�
 | **2** |      |  0   | 750  | 1875 |
 | **3** |      |      |  0   | 2250 |
 | **4** |      |      |      |  0   |
+
+# Code
+
+<br>
+
+<strong> 소스코드
+
+<br>
+
+### Bottom-up 구상
+> 처음 구간 간격  i 를 설정한 후 그 구간 길이에 따라 구할 수 있는 행렬의 곱셈을 구한 뒤 값을 저장하는 방식
+
+```JAVA
+public class ChainedMatrixMultiplications {
+
+    static int n, INF = Integer.MAX_VALUE;
+    static int[] data;
+    static int [][] dp = new int[n][n];
+
+    public static void main(String [] args) throws IOException{
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        n = Integer.parseInt(br.readLine());
+
+        data = new int[n+1];
+        StringTokenizer st = null;
+        for(int i=0; i<n; i++) {
+            st = new StringTokenizer(br.readLine());
+            int a = Integer.parseInt(st.nextToken());
+            int b = Integer.parseInt(st.nextToken());
+            data[i] = a; data[i+1] = b;
+        }
+
+        dp = new int[n][n];
+
+        for(int i=1; i<n; i++) {
+            for(int j=0; j<n-i; j++) {
+                dp[j][j+i] = INF;
+                for(int k=0; k<i; k++) {
+                    int cost = dp[j][k]  + dp[k+1][j+i-1] + (data[j]*data[k+1]*data[j+i]);
+                    dp[j][j+i] = Math.min(dp[j][j+i], cost);
+                }
+            }
+        }
+        System.out.println(dp[0][n-1]);
+    }
+
+}
+```
+### Top-down 구상
+
+```JAVA
+public class ChainedMatrixMultiplications {
+    
+    static int n, INF = Integer.MAX_VALUE;
+	static int[] data;
+	static int[][] dp;
+	public static void main(String[] args) throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		n = Integer.parseInt(br.readLine());
+		
+		data = new int[n+1];
+		StringTokenizer st = null;
+		for(int i=0; i<n; i++) {
+			st = new StringTokenizer(br.readLine());
+			int a = Integer.parseInt(st.nextToken());
+			int b = Integer.parseInt(st.nextToken());
+			data[i] = a; data[i+1] = b;
+		}
+		
+		dp = new int[n][n];
+		for(int i=0; i<n; i++) {
+			Arrays.fill(dp[i], INF);
+		}
+		System.out.println(solve(0,n-1));
+	}
+	static int solve(int pos, int cur) {
+		if(pos == cur) return 0;
+		if(dp[pos][cur] != INF) return dp[pos][cur];
+		
+		for(int i=pos; i<cur; i++) {
+			int value = solve(pos,i) + solve(i+1, cur) + (data[pos] *data[i+1]*data[cur+1]);
+			dp[pos][cur] = Math.min(dp[pos][cur], value);
+		}
+		
+		return dp[pos][cur];
+	}
+
+}
+```
